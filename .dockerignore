@@ -1,0 +1,12 @@
+venv/
+notebooks/
+data/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+*.ipynb
+frontend/
+tests/
+.pytest_cache/
+PROJECT_LOG.md
