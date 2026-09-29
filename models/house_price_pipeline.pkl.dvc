@@ -1,0 +1,5 @@
+outs:
+- md5: e403068f24c2a4c82fc1887b85a27150
+  size: 21922
+  hash: md5
+  path: house_price_pipeline.pkl
