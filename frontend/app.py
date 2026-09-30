@@ -104,94 +104,35 @@ def predict_from_ui(
 
 
 # ---- Custom theme ----
-theme = gr.themes.Soft(
-    primary_hue="emerald",
-    secondary_hue="slate",
-    neutral_hue="slate",
-    font=[gr.themes.GoogleFont("Poppins"), "sans-serif"],
-).set(
-    button_primary_background_fill="*primary_600",
-    button_primary_background_fill_hover="*primary_700",
-    block_title_text_weight="600",
+# ---- Redesigned Gradio interface ----
+from house_ui import build_app, launch_app
+
+# Preserve the exact dropdown choices from your original app.
+UI_CHOICES = {
+    "neighborhood": [
+        "CollgCr", "NAmes", "OldTown", "Edwards", "Somerst",
+        "Gilbert", "NridgHt", "Sawyer", "NWAmes", "SawyerW",
+    ],
+    "house_style": [
+        "1Story", "2Story", "1.5Fin", "SLvl", "SFoyer",
+    ],
+    "bldg_type": [
+        "1Fam", "TwnhsE", "Twnhs", "Duplex", "2fmCon",
+    ],
+    "kitchen_qual": ["Ex", "Gd", "TA", "Fa"],
+    "exter_qual": ["Ex", "Gd", "TA", "Fa"],
+}
+
+demo = build_app(
+    predict_from_ui=predict_from_ui,
+    choices=UI_CHOICES,
 )
 
-CUSTOM_CSS = """
-#header {text-align: center; padding: 10px 0 0 0;}
-#header h1 {font-size: 2.2rem; margin-bottom: 0;}
-#header p {color: var(--body-text-color-subdued); font-size: 1rem;}
-#result-box {
-    text-align: center;
-    padding: 20px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #10b98122, #06b6d422);
-    border: 1px solid #10b98155;
-}
-#result-box h2 {font-size: 2.4rem; margin: 0;}
-.gradio-container {max-width: 1100px !important; margin: auto;}
-"""
-
-with gr.Blocks(title="House Price Predictor") as demo:
-
-    with gr.Column(elem_id="header"):
-        gr.Markdown("# 🏠 House Price Predictor")
-        gr.Markdown("Estimate a home's market value from its key features — powered by a tuned Ridge regression model.")
-
-    with gr.Row():
-        with gr.Column(scale=1):
-            with gr.Group():
-                gr.Markdown("### 📐 Size & Structure")
-                living_area = gr.Slider(400, 5000, value=1500, step=50, label="Living Area (sq ft)")
-                lot_area = gr.Slider(1000, 20000, value=8000, step=100, label="Lot Area (sq ft)")
-                total_bsmt_sf = gr.Slider(0, 3000, value=800, step=50, label="Basement Area (sq ft)")
-                year_built = gr.Slider(1900, 2010, value=2000, step=1, label="Year Built")
-
-            with gr.Group():
-                gr.Markdown("### 🛏️ Rooms")
-                bedrooms = gr.Slider(0, 8, value=3, step=1, label="Bedrooms Above Ground")
-                full_bath = gr.Slider(0, 4, value=2, step=1, label="Full Bathrooms")
-                fireplaces = gr.Slider(0, 3, value=0, step=1, label="Fireplaces")
-
-        with gr.Column(scale=1):
-            with gr.Group():
-                gr.Markdown("### ⭐ Quality")
-                overall_qual = gr.Slider(1, 10, value=6, step=1, label="Overall Quality")
-                kitchen_qual = gr.Dropdown(["Ex", "Gd", "TA", "Fa"], value="TA", label="Kitchen Quality")
-                exter_qual = gr.Dropdown(["Ex", "Gd", "TA", "Fa"], value="TA", label="Exterior Quality")
-
-            with gr.Group():
-                gr.Markdown("### 🚗 Garage")
-                garage_cars = gr.Slider(0, 4, value=2, step=1, label="Garage Capacity (cars)")
-                garage_area = gr.Slider(0, 1200, value=400, step=50, label="Garage Area (sq ft)")
-
-            with gr.Group():
-                gr.Markdown("### 📍 Location & Style")
-                neighborhood = gr.Dropdown(
-                    ["CollgCr", "NAmes", "OldTown", "Edwards", "Somerst",
-                     "Gilbert", "NridgHt", "Sawyer", "NWAmes", "SawyerW"],
-                    value="CollgCr", label="Neighborhood"
-                )
-                house_style = gr.Dropdown(
-                    ["1Story", "2Story", "1.5Fin", "SLvl", "SFoyer"],
-                    value="1Story", label="House Style"
-                )
-                bldg_type = gr.Dropdown(
-                    ["1Fam", "TwnhsE", "Twnhs", "Duplex", "2fmCon"],
-                    value="1Fam", label="Building Type"
-                )
-
-    predict_btn = gr.Button("🔮 Predict Price", variant="primary", size="lg")
-
-    with gr.Group(elem_id="result-box", visible=False) as result_box:
-        result_output = gr.Markdown("## $0")
-
-    predict_btn.click(
-        fn=predict_from_ui,
-        inputs=[living_area, overall_qual, year_built, garage_cars, garage_area,
-                total_bsmt_sf, bedrooms, full_bath, neighborhood, house_style,
-                bldg_type, kitchen_qual, exter_qual, lot_area, fireplaces],
-        outputs=[result_output, result_box]
-    )
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
-    demo.launch(theme=theme, css=CUSTOM_CSS, server_name="0.0.0.0", server_port=port)
+    import house_ui
+
+    print("Running app:", os.path.abspath(__file__))
+    print("Using UI:", house_ui.__file__)
+
+    os.environ["PORT"] = "10000"  
+    launch_app(demo)
