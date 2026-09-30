@@ -193,4 +193,5 @@ with gr.Blocks(title="House Price Predictor") as demo:
     )
 
 if __name__ == "__main__":
-    demo.launch(theme=theme, css=CUSTOM_CSS)
+    port = int(os.environ.get("PORT", 7860))
+    demo.launch(theme=theme, css=CUSTOM_CSS, server_name="0.0.0.0", server_port=port)
